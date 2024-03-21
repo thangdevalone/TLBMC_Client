@@ -1,0 +1,314 @@
+body {
+    overflow: hidden;
+}
+.ql-container {
+    box-sizing: border-box;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    margin: 0px;
+    height: 200px !important;
+    position: relative;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.ql-toolbar.ql-snow {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.trigger-menu:active span.chevron-down-icon {
+    transition: 0.5s transform;
+    transform: rotate(-90deg);
+}
+input[type='date']::-webkit-inner-spin-button,
+input[type='date']::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+.nav-bs {
+    box-shadow: 0 4px 4px -1px rgba(0, 0, 0, 0.2);
+}
+.side-bs {
+    box-shadow: 2px 0px 10px 0px rgba(0, 0, 0, 0.2);
+}
+.loading-page {
+    animation: fadeout 2s ease-in-out forwards;
+    -webkit-animation: fadeout 2s ease-in-out forwards;
+    -moz-animation: fadeout 2s ease-in-out forwards;
+}
+.loading-page .spinner {
+    animation: fadeout-2 1s ease-in-out forwards;
+    -webkit-animation: fadeout 2s ease-in-out forwards;
+    -moz-animation: fadeout 2s ease-in-out forwards;
+}
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+@-webkit-keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+@-moz-keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+@keyframes fadeout-2 {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+@-webkit-keyframes fadeout-2 {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+@-moz-keyframes fadeout-2 {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+.spinner {
+    --animation-duration: 4000ms;
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+    transform: rotate(45deg);
+}
+.spinner .spinner-item {
+    --item-size: calc(var(--size) / 2.5);
+    position: absolute;
+    width: var(--item-size);
+    height: var(--item-size);
+    border: 4px solid var(--clr-spinner);
+}
+.spinner .spinner-item:nth-child(1) {
+    --clr-spinner: var(--clr1);
+    top: 0;
+    left: 0;
+    animation: spinner3A var(--animation-duration) linear infinite;
+}
+@keyframes spinner3A {
+    0%,
+    8.33%,
+    16.66%,
+    100% {
+        transform: translate(0%, 0%);
+    }
+    24.99%,
+    33.32%,
+    41.65% {
+        transform: translate(100%, 0%);
+    }
+    49.98%,
+    58.31%,
+    66.64% {
+        transform: translate(100%, 100%);
+    }
+    74.97%,
+    83.30%,
+    91.63% {
+        transform: translate(0%, 100%);
+    }
+}
+.spinner .spinner-item:nth-child(2) {
+    --clr-spinner: var(--clr3);
+    top: 0;
+    left: var(--item-size);
+    animation: spinner3B var(--animation-duration) linear infinite;
+}
+@keyframes spinner3B {
+    0%,
+    8.33%,
+    91.63%,
+    100% {
+        transform: translate(0%, 0%);
+    }
+    16.66%,
+    24.99%,
+    33.32% {
+        transform: translate(0%, 100%);
+    }
+    41.65%,
+    49.98%,
+    58.31% {
+        transform: translate(-100%, 100%);
+    }
+    66.64%,
+    74.97%,
+    83.30% {
+        transform: translate(-100%, 0%);
+    }
+}
+.spinner .spinner-item:nth-child(3) {
+    --clr-spinner: var(--clr5);
+    top: var(--item-size);
+    left: var(--item-size);
+    animation: spinner3C var(--animation-duration) linear infinite;
+}
+@keyframes spinner3C {
+    0%,
+    83.30%,
+    91.63%,
+    100% {
+        transform: translate(0, 0);
+    }
+    8.33%,
+    16.66%,
+    24.99% {
+        transform: translate(-100%, 0);
+    }
+    33.32%,
+    41.65%,
+    49.98% {
+        transform: translate(-100%, -100%);
+    }
+    58.31%,
+    66.64%,
+    74.97% {
+        transform: translate(0, -100%);
+    }
+}
+.box-s::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 15px !important;
+}
+
+/* Track */
+.box-s::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 15px !important;
+}
+
+/* Handle */
+.box-s::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 15px !important;
+}
+
+/* Handle on hover */
+.box-s::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    border-radius: 15px !important;
+}
+.container-chat > .chat {
+    margin-left: 50px;
+    margin-top: 15px;
+}
+.container-chat > .chat-box {
+  margin-left: 50px;
+}
+.b-after{
+  position: relative;
+}
+.b-after::before{
+  content: '';
+  display: block;
+  position: absolute;
+  left: 20px;
+  border-left:2px solid #e1e1e1;
+  height: calc(100% - 30px);
+}
+.dark .b-after::before{
+    border-left:2px solid #4d4d4d;
+}
+.b-after-has{
+  position: relative;
+}
+.b-after-has::before{
+  content: '';
+  display: block;
+  position: absolute;
+  left: 20px;
+  border-left:2px solid #e1e1e1;
+  height: calc(100% - 60px);
+}
+.dark .b-after-has::before{
+
+    border-left:2px solid #4d4d4d;
+  }
+.c-after{
+  position: relative;
+}
+.c-after::before{
+  content: '';
+  display: block;
+  position: absolute;
+  left: -30px;
+  top:3px;
+  width: 25px;
+  height: 20px;
+  border-bottom-left-radius: 10px;
+
+  border-left:2px solid #e1e1e1;
+  border-bottom:2px solid #e1e1e1;
+}
+.c-after-box{
+  position: relative;
+}
+.c-after-box::before{
+  content: '';
+  display: block;
+  position: absolute;
+  left: -30px;
+  top:12px;
+  width: 25px;
+  height: 20px;
+  border-bottom-left-radius: 10px;
+  border-left:2px solid #e1e1e1;
+  border-bottom:2px solid #e1e1e1;
+}
+.dark .c-after-box::before{
+    border-left:2px solid #4d4d4d;
+    border-bottom:2px solid #4d4d4d;
+  } 
+  .dark .c-after::before{
+    border-left:2px solid #4d4d4d;
+    border-bottom:2px solid #4d4d4d;
+  } 
+.dark .ql-snow .ql-stroke {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+.dark .ql-snow .ql-picker-label::before{
+    color: white;
+}
+.dark .ql-editor.ql-blank::before{
+    color: white;
+}
