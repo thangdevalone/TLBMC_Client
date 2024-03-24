@@ -1,27 +1,14 @@
-import { useInfoUser } from "@/hooks"
-import { InforUser } from "@/models";
+import { useInfoUser } from "@/hooks";
+import { InfoUser } from "@/models";
 class Permission {
-    user: InforUser;
-    constructor(user:InforUser) {
+    user: InfoUser;
+    constructor(user:InfoUser) {
         this.user = user;
     }
 
-    get IS_ADMIN_OR_HR() {
-        return this.user?.RoleName === "Admin" || this.user?.RoleName === "Hr";
-    }
-    get IS_ADMIN_OR_HR_MANAGER() {
-        return this.user?.RoleName === "Admin" || this.user?.RoleName === "Hr"|| this.user?.RoleName === "Manager";
-    }
+
     get IS_ADMIN() {
-        return this.user?.RoleName === "Admin";
-    }
-
-    get IS_HR() {
-        return this.user?.RoleName === "Hr";
-    }
-
-    get IS_HR_MANAGER() {
-        return this.user?.RoleName === "Hr" || this.user?.RoleName === "Manager";
+        return this.user.is_superuser;
     }
 }
 

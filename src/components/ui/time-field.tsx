@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { DateSegment } from "./date-segment";
@@ -16,7 +17,6 @@ function TimeField(props: AriaTimeFieldProps<TimeValue>) {
 	});
 	const {
 		fieldProps: { ...fieldProps },
-		labelProps,
 	} = useTimeField(props, state, ref);
 	return (
 		<div

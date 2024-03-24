@@ -3,15 +3,31 @@ import authApi from '@/api/authApi';
 import postApi from '@/api/postApi';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { Icons } from '@/components/icons';
-import { AlertDialogHeader } from '@/components/ui/alert-dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -37,6 +53,7 @@ import {
     Globe,
     Heart,
     Instagram,
+    Layers3,
     Linkedin,
     Loader,
     Pencil,
@@ -44,7 +61,6 @@ import {
     Search,
     Send,
     Share2,
-    Upload,
     User,
 } from 'lucide-react';
 import React, { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
@@ -67,11 +83,19 @@ export const NewsFeed = () => {
     const inputRefs = useRef<Array<React.RefObject<HTMLInputElement>>>(
         Array.from({ length: 9 }).map(() => React.createRef())
     );
-
+    const [alertData, setAlertData] = useState<any>();
+    const [openAlert, setOpenAlert] = useState(false);
     const handleClick = (index: number) => {
         const inputRef = inputRefs.current[index];
         if (inputRef && inputRef.current) {
             inputRef.current.click();
+        }
+    };
+    const navDel = () => {
+        if (alertData&& alertData.type === 'cmt') {
+            handleDelCom(alertData.id);
+        } else {
+            handleDelPost(alertData.id);
         }
     };
     const dispatch = useAppDispatch();
@@ -95,7 +119,7 @@ export const NewsFeed = () => {
                             title: 'Tải ảnh thành công',
                         });
                         setPreviewImage(res);
-                        dispatch(authActions.setUser({ "related_images": res }));
+                        dispatch(authActions.setUser({ related_images: res }));
                     } catch (error) {
                         console.log(error);
                     }
@@ -120,14 +144,13 @@ export const NewsFeed = () => {
     const fetchPosts = async () => {
         try {
             const data = (await postApi.getNew()) as unknown as InfoPost[];
-            console.log(data);
             setPosts(data);
         } catch (error) {
             console.log(error);
         }
     };
-    const handleMessage = (message: { data: string }) => {
-        console.log('dsad');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleMessage = (_message: { data: string }) => {
         fetchPosts();
     };
     const modules = {
@@ -186,6 +209,12 @@ export const NewsFeed = () => {
         try {
             await postApi.likeComment(cmtid);
             fetchPosts();
+            setAlertData(undefined);
+            setOpenAlert(false)
+            toast({
+                title:"Xóa bình luận thành công"
+            })
+
         } catch (error) {
             console.log(error);
         }
@@ -218,6 +247,31 @@ export const NewsFeed = () => {
     };
     const handleRepChange = (event: ChangeEvent<HTMLInputElement>) => {
         setValueRep(event.target.value);
+    };
+    const handleDelPost = (id: number) => {
+        (async () => {
+            try {
+                await postApi.delNew(id);
+                fetchPosts();
+                setAlertData(undefined)
+                setOpenAlert(false)
+                toast({
+                    title:"Xóa bài viết thành công"
+                })
+            } catch (error) {
+                console.log(error);
+            }
+        })();
+    };
+    const handleDelCom = (id: number) => {
+        (async () => {
+            try {
+                await postApi.delCom(id);
+                fetchPosts();
+            } catch (error) {
+                console.log(error);
+            }
+        })();
     };
     const handleKeyDownRep = (event: KeyboardEvent<HTMLInputElement>, data: any, p: number) => {
         if (event.key === 'Enter') {
@@ -370,22 +424,33 @@ export const NewsFeed = () => {
                                 </DialogTrigger>
                             </div>
                             <div className="grid mt-2 grid-cols-3">
-                                <Button variant="ghost" className="hover:bg-slate-200 dark:hover:bg-[#334257]">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => fetchPosts()}
+                                    className="hover:bg-slate-200 dark:hover:bg-[#334257]"
+                                >
                                     <Loader size={20} className="mr-3" />
                                     Tải mới bài viết
                                 </Button>
-                                <Button variant="ghost" className="hover:bg-slate-200 dark:hover:bg-[#334257]">
-                                    <Upload size={20} className="mr-3" />
-                                    Tải khóa học mới
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => navigate('/home/learns')}
+                                    className="hover:bg-slate-200 dark:hover:bg-[#334257]"
+                                >
+                                    <Layers3 size={20} className="mr-3" />
+                                    Xem khóa học mới
                                 </Button>
-                                <Button variant="ghost" className="hover:bg-slate-200 dark:hover:bg-[#334257]">
+                                <Button
+                                    variant="ghost"
+                                    className="hover:bg-slate-200 dark:hover:bg-[#334257]"
+                                >
                                     <Search size={20} className="mr-3" />
                                     Tìm kiếm
                                 </Button>
                             </div>
 
                             <DialogContent className="max-w-2xl">
-                                <AlertDialogHeader>
+                                <DialogHeader>
                                     <DialogTitle className="flex flex-row gap-3 mb-2 items-center">
                                         Tạo bài viết mới{' '}
                                         <Select
@@ -409,7 +474,7 @@ export const NewsFeed = () => {
                                         thể chọn đăng chế độ dạng bạn bè. Hãy chia sẻ nhưng kỉ niệm
                                         về công việc của bạn
                                     </DialogDescription>
-                                </AlertDialogHeader>
+                                </DialogHeader>
                                 <ReactQuill
                                     theme="snow"
                                     value={editorHtml}
@@ -437,12 +502,53 @@ export const NewsFeed = () => {
                             key={item.id}
                             className="rounded-md px-4 pt-3 pb-2 bg-background shadow-md"
                         >
-                            <div className="flex gap-2.5 flex-row">
+                            <div className="flex relative gap-2.5 flex-row">
                                 <img
                                     src={`${STATIC_HOST_NO_SPLASH + item.author.profile_picture}`}
                                     className="rounded-full  w-[45px] h-[45px] object-cover border "
                                 />
                                 <div className="flex flex-col justify-between">
+                                    {item.author.id === user?.id && (
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger className="absolute right-0">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    className="lucide lucide-ellipsis-vertical"
+                                                >
+                                                    <circle cx="12" cy="12" r="1" />
+                                                    <circle cx="12" cy="5" r="1" />
+                                                    <circle cx="12" cy="19" r="1" />
+                                                </svg>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                {/* <DropdownMenuItem><Pencil className='mr-2'/> Sửa bài viết</DropdownMenuItem> */}
+                                                <DropdownMenuItem
+                                                      onClick={() => {
+                                                        setAlertData(
+                                                            {
+                                                                type: 'post',
+                                                                id: item.id,
+                                                            }
+                                                        );
+                                                        setOpenAlert(
+                                                            true
+                                                        );
+                                                    }}
+                                                >
+                                                    Gỡ bài viết
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    )}
+
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <span className="font-semibold  text-start  max-w-[350px] line-clamp-1">
@@ -458,7 +564,7 @@ export const NewsFeed = () => {
                                     <span className="text-gray-500 flex flex-row gap-2 text-[12px]">
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <span className="text-gray-500 hover:underline  cursor-default text-[12px]">
+                                                <span className="text-gray-500 capitalize hover:underline  cursor-default text-[12px]">
                                                     {formatDistanceToNow(
                                                         new Date(item.created_at),
                                                         {
@@ -603,358 +709,414 @@ export const NewsFeed = () => {
                                             </p>
                                             <div className="flex flex-col gap-3 mt-3 ">
                                                 {item.comments.map((cmt) => (
-                                                    <div
-                                                        className={cn(
-                                                            'container-chat',
-                                                            repOpen ? ' b-after' : ' b-after-has'
-                                                        )}
-                                                    >
+                                                    <>
                                                         {cmt.rep === null && (
                                                             <div
-                                                                key={cmt.id}
-                                                                className="flex gap-3 w-fit max-w-[350px] relative flex-row"
+                                                                className={cn(
+                                                                    'container-chat',
+                                                                    repOpen
+                                                                        ? ' b-after'
+                                                                        : ' b-after-has'
+                                                                )}
                                                             >
-                                                                <img
-                                                                    src={`${
-                                                                        STATIC_HOST_NO_SPLASH +
-                                                                        cmt.author.profile_picture
-                                                                    }`}
-                                                                    className="rounded-full  w-[40px] h-[40px] object-cover border "
-                                                                />
-                                                                <div>
-                                                                    <div className="rounded-2xl relative px-3 pt-1 pb-2 bg-slate-200 dark:bg-[#334257] ">
-                                                                        <p className="font-medium text-sm">
-                                                                            {cmt.author.full_name}
-                                                                        </p>
-                                                                        <p className="">
-                                                                            {cmt.content}
-                                                                        </p>
-                                                                        {cmt.author.id ===
-                                                                            user?.id && (
-                                                                            <span className="text-gray-500 font-bold absolute -right-10 top-[50%] -translate-y-1/2 text-sm hover:underline cursor-pointer">
-                                                                                Gỡ
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="flex relative flex-row mt-1 px-3 gap-3">
-                                                                        <Tooltip>
-                                                                            <TooltipTrigger asChild>
-                                                                                <span className="text-gray-500 hover:underline  cursor-default text-[12px]">
-                                                                                    {formatDistanceToNow(
-                                                                                        new Date(
-                                                                                            cmt.created_at
-                                                                                        ),
-                                                                                        {
-                                                                                            locale: vi,
-                                                                                        }
-                                                                                    )}
+                                                                <div
+                                                                    key={cmt.id}
+                                                                    className="flex gap-3 w-fit max-w-[350px] relative flex-row"
+                                                                >
+                                                                    <img
+                                                                        src={`${
+                                                                            STATIC_HOST_NO_SPLASH +
+                                                                            cmt.author
+                                                                                .profile_picture
+                                                                        }`}
+                                                                        className="rounded-full  w-[40px] h-[40px] object-cover border "
+                                                                    />
+                                                                    <div>
+                                                                        <div className="rounded-2xl relative px-3 pt-1 pb-2 bg-slate-200 dark:bg-[#334257] ">
+                                                                            <p className="font-medium text-sm">
+                                                                                {
+                                                                                    cmt.author
+                                                                                        .full_name
+                                                                                }
+                                                                            </p>
+                                                                            <p className="">
+                                                                                {cmt.content}
+                                                                            </p>
+                                                                            {cmt.author.id ===
+                                                                                user?.id && (
+                                                                                <span
+                                                                                    onClick={() => {
+                                                                                        setAlertData(
+                                                                                            {
+                                                                                                type: 'cmt',
+                                                                                                id: cmt.id,
+                                                                                            }
+                                                                                        );
+                                                                                        setOpenAlert(
+                                                                                            true
+                                                                                        );
+                                                                                    }}
+                                                                                    className="text-gray-500 font-bold absolute -right-10 top-[50%] -translate-y-1/2 text-sm hover:underline cursor-pointer"
+                                                                                >
+                                                                                    Gỡ
                                                                                 </span>
-                                                                            </TooltipTrigger>
-                                                                            <TooltipContent>
-                                                                                {format(
-                                                                                    new Date(
-                                                                                        cmt.created_at
-                                                                                    ),
-                                                                                    "cccc, d 'tháng' M, yyyy 'lúc' HH:mm",
-                                                                                    { locale: vi }
-                                                                                )}
-                                                                            </TooltipContent>
-                                                                        </Tooltip>
-                                                                        {cmt.likes.length > 0 && (
+                                                                            )}
+                                                                        </div>
+                                                                        <div className="flex relative flex-row mt-1 px-3 gap-3">
                                                                             <Tooltip>
                                                                                 <TooltipTrigger
                                                                                     asChild
                                                                                 >
-                                                                                    <div className="absolute flex  shadow-md cursor-default bottom-[20px] right-[-10px] z-[2] py-0.5 pr-1 rounded-xl bg-background font-semibold items-center">
-                                                                                        <img
-                                                                                            src="/assets/like.png"
-                                                                                            className="w-[23px] h-[23px]"
-                                                                                        />
-                                                                                        {
-                                                                                            cmt
-                                                                                                .likes
-                                                                                                .length
-                                                                                        }
-                                                                                    </div>
-                                                                                </TooltipTrigger>
-                                                                                <TooltipContent>
-                                                                                    <>
-                                                                                        {cmt.likes
-                                                                                            .slice(
-                                                                                                0,
-                                                                                                10
-                                                                                            )
-                                                                                            .map(
-                                                                                                (
-                                                                                                    lk: any,
-                                                                                                    index: number
-                                                                                                ) => (
-                                                                                                    <p
-                                                                                                        key={
-                                                                                                            lk.id
-                                                                                                        }
-                                                                                                    >
-                                                                                                        {index !==
-                                                                                                        9
-                                                                                                            ? convertUser(
-                                                                                                                  lk
-                                                                                                                      .user
-                                                                                                                      .id,
-                                                                                                                  lk
-                                                                                                                      .user
-                                                                                                                      .full_name,
-                                                                                                                  user
-                                                                                                              )
-                                                                                                            : '...'}
-                                                                                                    </p>
-                                                                                                )
-                                                                                            )}
-                                                                                    </>
-                                                                                </TooltipContent>
-                                                                            </Tooltip>
-                                                                        )}
-                                                                        {cmt.likes.findIndex(
-                                                                            (lk: any) =>
-                                                                                lk.user.id ===
-                                                                                user?.id
-                                                                        ) !== -1 ? (
-                                                                            <span
-                                                                                onClick={() =>
-                                                                                    handleLikeComment(
-                                                                                        cmt.id
-                                                                                    )
-                                                                                }
-                                                                                className="text-[blue] cursor-pointer hover:underline font-bold text-[12px]"
-                                                                            >
-                                                                                Bỏ thích
-                                                                            </span>
-                                                                        ) : (
-                                                                            <span
-                                                                                onClick={() =>
-                                                                                    handleLikeComment(
-                                                                                        cmt.id
-                                                                                    )
-                                                                                }
-                                                                                className="text-gray-500 cursor-pointer hover:underline font-bold text-[12px]"
-                                                                            >
-                                                                                Thích
-                                                                            </span>
-                                                                        )}
-
-                                                                        <span
-                                                                            onClick={() => {
-                                                                                setRepOpen(cmt.id);
-                                                                                setValueRep(
-                                                                                    '@' +
-                                                                                        cmt.author
-                                                                                            .full_name +
-                                                                                        ' '
-                                                                                );
-                                                                            }}
-                                                                            className="text-gray-500 cursor-pointer hover:underline font-bold  text-[12px]"
-                                                                        >
-                                                                            Trả lời
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                        {item.comments
-                                                            .filter((re) => re.rep === cmt.id)
-                                                            .map((data) => (
-                                                                <div className="chat c-after">
-                                                                    <div
-                                                                        key={data.id}
-                                                                        className="flex gap-3 w-fit max-w-[350px] relative flex-row"
-                                                                    >
-                                                                        <img
-                                                                            src={`${
-                                                                                STATIC_HOST_NO_SPLASH +
-                                                                                data.author
-                                                                                    .profile_picture
-                                                                            }`}
-                                                                            className="rounded-full  w-[40px] h-[40px] object-cover border "
-                                                                        />
-                                                                        <div>
-                                                                            <div className="rounded-2xl relative px-3 pt-1 pb-2 bg-slate-200 dark:bg-[#334257]">
-                                                                                <p className="font-medium text-sm">
-                                                                                    {
-                                                                                        data.author
-                                                                                            .full_name
-                                                                                    }
-                                                                                </p>
-                                                                                <p className="">
-                                                                                    {data.content}
-                                                                                </p>
-                                                                                {data.author.id ===
-                                                                                    user?.id && (
-                                                                                    <span className="text-gray-500 font-bold absolute -right-10 top-[50%] -translate-y-1/2 text-sm hover:underline cursor-pointer">
-                                                                                        Gỡ
-                                                                                    </span>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className="flex relative flex-row mt-1 px-3 gap-3">
-                                                                                <Tooltip>
-                                                                                    <TooltipTrigger
-                                                                                        asChild
-                                                                                    >
-                                                                                        <span className="text-gray-500 hover:underline  cursor-default text-[12px]">
-                                                                                            {formatDistanceToNow(
-                                                                                                new Date(
-                                                                                                    data.created_at
-                                                                                                ),
-                                                                                                {
-                                                                                                    locale: vi,
-                                                                                                }
-                                                                                            )}
-                                                                                        </span>
-                                                                                    </TooltipTrigger>
-                                                                                    <TooltipContent>
-                                                                                        {format(
+                                                                                    <span className="text-gray-500 hover:underline  cursor-default text-[12px]">
+                                                                                        {formatDistanceToNow(
                                                                                             new Date(
-                                                                                                data.created_at
+                                                                                                cmt.created_at
                                                                                             ),
-                                                                                            "cccc, d 'tháng' M, yyyy 'lúc' HH:mm",
                                                                                             {
                                                                                                 locale: vi,
                                                                                             }
                                                                                         )}
+                                                                                    </span>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                    {format(
+                                                                                        new Date(
+                                                                                            cmt.created_at
+                                                                                        ),
+                                                                                        "cccc, d 'tháng' M, yyyy 'lúc' HH:mm",
+                                                                                        {
+                                                                                            locale: vi,
+                                                                                        }
+                                                                                    )}
+                                                                                </TooltipContent>
+                                                                            </Tooltip>
+                                                                            {cmt.likes.length >
+                                                                                0 && (
+                                                                                <Tooltip>
+                                                                                    <TooltipTrigger
+                                                                                        asChild
+                                                                                    >
+                                                                                        <div className="absolute flex  shadow-md cursor-default bottom-[20px] right-[-10px] z-[2] py-0.5 pr-1 rounded-xl bg-background font-semibold items-center">
+                                                                                            <img
+                                                                                                src="/assets/like.png"
+                                                                                                className="w-[23px] h-[23px]"
+                                                                                            />
+                                                                                            {
+                                                                                                cmt
+                                                                                                    .likes
+                                                                                                    .length
+                                                                                            }
+                                                                                        </div>
+                                                                                    </TooltipTrigger>
+                                                                                    <TooltipContent>
+                                                                                        <>
+                                                                                            {cmt.likes
+                                                                                                .slice(
+                                                                                                    0,
+                                                                                                    10
+                                                                                                )
+                                                                                                .map(
+                                                                                                    (
+                                                                                                        lk: any,
+                                                                                                        index: number
+                                                                                                    ) => (
+                                                                                                        <p
+                                                                                                            key={
+                                                                                                                lk.id
+                                                                                                            }
+                                                                                                        >
+                                                                                                            {index !==
+                                                                                                            9
+                                                                                                                ? convertUser(
+                                                                                                                      lk
+                                                                                                                          .user
+                                                                                                                          .id,
+                                                                                                                      lk
+                                                                                                                          .user
+                                                                                                                          .full_name,
+                                                                                                                      user
+                                                                                                                  )
+                                                                                                                : '...'}
+                                                                                                        </p>
+                                                                                                    )
+                                                                                                )}
+                                                                                        </>
                                                                                     </TooltipContent>
                                                                                 </Tooltip>
-                                                                                {data.likes.length >
-                                                                                    0 && (
-                                                                                    <Tooltip>
-                                                                                        <TooltipTrigger
-                                                                                            asChild
-                                                                                        >
-                                                                                            <div className="absolute flex  shadow-md cursor-default bottom-[5px] right-[-15px] dark:border z-[2] py-0.5 pr-1 rounded-xl bg-background font-semibold items-center">
-                                                                                                <img
-                                                                                                    src="/assets/like.png"
-                                                                                                    className="w-[20px] h-[20px]"
-                                                                                                />
-                                                                                                {
-                                                                                                    data
-                                                                                                        .likes
-                                                                                                        .length
-                                                                                                }
-                                                                                            </div>
-                                                                                        </TooltipTrigger>
-                                                                                        <TooltipContent>
-                                                                                            <>
-                                                                                                {data.likes
-                                                                                                    .slice(
-                                                                                                        0,
-                                                                                                        10
-                                                                                                    )
-                                                                                                    .map(
-                                                                                                        (
-                                                                                                            lk: any,
-                                                                                                            index: number
-                                                                                                        ) => (
-                                                                                                            <p
-                                                                                                                key={
-                                                                                                                    lk.id
-                                                                                                                }
-                                                                                                            >
-                                                                                                                {index !==
-                                                                                                                9
-                                                                                                                    ? convertUser(
-                                                                                                                          lk
-                                                                                                                              .user
-                                                                                                                              .id,
-                                                                                                                          lk
-                                                                                                                              .user
-                                                                                                                              .full_name,
-                                                                                                                          user
-                                                                                                                      )
-                                                                                                                    : '...'}
-                                                                                                            </p>
-                                                                                                        )
-                                                                                                    )}
-                                                                                            </>
-                                                                                        </TooltipContent>
-                                                                                    </Tooltip>
-                                                                                )}
-                                                                                {data.likes.findIndex(
-                                                                                    (lk: any) =>
-                                                                                        lk.user
-                                                                                            .id ===
-                                                                                        user?.id
-                                                                                ) !== -1 ? (
-                                                                                    <span
-                                                                                        onClick={() =>
-                                                                                            handleLikeComment(
-                                                                                                data.id
-                                                                                            )
-                                                                                        }
-                                                                                        className="text-[blue] cursor-pointer hover:underline font-bold text-[12px]"
-                                                                                    >
-                                                                                        Bỏ thích
-                                                                                    </span>
-                                                                                ) : (
-                                                                                    <span
-                                                                                        onClick={() =>
-                                                                                            handleLikeComment(
-                                                                                                data.id
-                                                                                            )
-                                                                                        }
-                                                                                        className="text-gray-500 cursor-pointer hover:underline font-bold text-[12px]"
-                                                                                    >
-                                                                                        Thích
-                                                                                    </span>
-                                                                                )}
-
+                                                                            )}
+                                                                            {cmt.likes.findIndex(
+                                                                                (lk: any) =>
+                                                                                    lk.user.id ===
+                                                                                    user?.id
+                                                                            ) !== -1 ? (
                                                                                 <span
-                                                                                    onClick={() => {
-                                                                                        setRepOpen(
+                                                                                    onClick={() =>
+                                                                                        handleLikeComment(
                                                                                             cmt.id
-                                                                                        );
-                                                                                        setValueRep(
-                                                                                            '@' +
-                                                                                                data
-                                                                                                    .author
-                                                                                                    .full_name +
-                                                                                                ' '
-                                                                                        );
-                                                                                    }}
-                                                                                    className="text-gray-500 cursor-pointer hover:underline font-bold  text-[12px]"
+                                                                                        )
+                                                                                    }
+                                                                                    className="text-[blue] cursor-pointer hover:underline font-bold text-[12px]"
                                                                                 >
-                                                                                    Trả lời
+                                                                                    Bỏ thích
                                                                                 </span>
-                                                                            </div>
+                                                                            ) : (
+                                                                                <span
+                                                                                    onClick={() =>
+                                                                                        handleLikeComment(
+                                                                                            cmt.id
+                                                                                        )
+                                                                                    }
+                                                                                    className="text-gray-500 cursor-pointer hover:underline font-bold text-[12px]"
+                                                                                >
+                                                                                    Thích
+                                                                                </span>
+                                                                            )}
+
+                                                                            <span
+                                                                                onClick={() => {
+                                                                                    setRepOpen(
+                                                                                        cmt.id
+                                                                                    );
+                                                                                    setValueRep(
+                                                                                        '@' +
+                                                                                            cmt
+                                                                                                .author
+                                                                                                .full_name +
+                                                                                            ' '
+                                                                                    );
+                                                                                }}
+                                                                                className="text-gray-500 cursor-pointer hover:underline font-bold  text-[12px]"
+                                                                            >
+                                                                                Trả lời
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            ))}
-                                                        {repOpen === cmt.id && (
-                                                            <div className="flex chat-box c-after-box gap-3 pt-[10px] bg-background items-center w-full  max-w-[400px]">
-                                                                <img
-                                                                    src={`${
-                                                                        STATIC_HOST_NO_SPLASH +
-                                                                        user?.profile_picture
-                                                                    }`}
-                                                                    className="rounded-full  w-[40px] h-[40px] object-cover border "
-                                                                />
-                                                                <Input
-                                                                    autoFocus={true}
-                                                                    value={valueRep}
-                                                                    onChange={handleRepChange}
-                                                                    spellCheck={false}
-                                                                    onKeyDown={(e) =>
-                                                                        handleKeyDownRep(
-                                                                            e,
-                                                                            cmt,
-                                                                            item.id
-                                                                        )
-                                                                    }
-                                                                    type="text"
-                                                                    placeholder="Trả lời bình luận...."
-                                                                    className="bg-slate-200 dark:bg-[#334257]  h-9 flex-1  rounded-3xl placeholder:text-gray-500 pl-4 pr-3"
-                                                                />
-                                                                <Send />
+
+                                                                {item.comments
+                                                                    .filter(
+                                                                        (re) => re.rep === cmt.id
+                                                                    )
+                                                                    .map((data) => (
+                                                                        <div className="chat c-after">
+                                                                            <div
+                                                                                key={data.id}
+                                                                                className="flex gap-3 w-fit max-w-[350px] relative flex-row"
+                                                                            >
+                                                                                <img
+                                                                                    src={`${
+                                                                                        STATIC_HOST_NO_SPLASH +
+                                                                                        data.author
+                                                                                            .profile_picture
+                                                                                    }`}
+                                                                                    className="rounded-full  w-[40px] h-[40px] object-cover border "
+                                                                                />
+                                                                                <div>
+                                                                                    <div className="rounded-2xl relative px-3 pt-1 pb-2 bg-slate-200 dark:bg-[#334257]">
+                                                                                        <p className="font-medium text-sm">
+                                                                                            {
+                                                                                                data
+                                                                                                    .author
+                                                                                                    .full_name
+                                                                                            }
+                                                                                        </p>
+                                                                                        <p className="">
+                                                                                            {
+                                                                                                data.content
+                                                                                            }
+                                                                                        </p>
+                                                                                        {data.author
+                                                                                            .id ===
+                                                                                            user?.id && (
+                                                                                            <span
+                                                                                            onClick={() => {
+                                                                                                setAlertData(
+                                                                                                    {
+                                                                                                        type: 'cmt',
+                                                                                                        id: data.id,
+                                                                                                    }
+                                                                                                );
+                                                                                                setOpenAlert(
+                                                                                                    true
+                                                                                                );
+                                                                                            }}
+                                                                                                className="text-gray-500 font-bold absolute -right-10 top-[50%] -translate-y-1/2 text-sm hover:underline cursor-pointer"
+                                                                                            >
+                                                                                                Gỡ
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    <div className="flex relative flex-row mt-1 px-3 gap-3">
+                                                                                        <Tooltip>
+                                                                                            <TooltipTrigger
+                                                                                                asChild
+                                                                                            >
+                                                                                                <span className="text-gray-500 hover:underline  cursor-default text-[12px]">
+                                                                                                    {formatDistanceToNow(
+                                                                                                        new Date(
+                                                                                                            data.created_at
+                                                                                                        ),
+                                                                                                        {
+                                                                                                            locale: vi,
+                                                                                                        }
+                                                                                                    )}
+                                                                                                </span>
+                                                                                            </TooltipTrigger>
+                                                                                            <TooltipContent>
+                                                                                                {format(
+                                                                                                    new Date(
+                                                                                                        data.created_at
+                                                                                                    ),
+                                                                                                    "cccc, d 'tháng' M, yyyy 'lúc' HH:mm",
+                                                                                                    {
+                                                                                                        locale: vi,
+                                                                                                    }
+                                                                                                )}
+                                                                                            </TooltipContent>
+                                                                                        </Tooltip>
+                                                                                        {data.likes
+                                                                                            .length >
+                                                                                            0 && (
+                                                                                            <Tooltip>
+                                                                                                <TooltipTrigger
+                                                                                                    asChild
+                                                                                                >
+                                                                                                    <div className="absolute flex  shadow-md cursor-default bottom-[5px] right-[-15px] dark:border z-[2] py-0.5 pr-1 rounded-xl bg-background font-semibold items-center">
+                                                                                                        <img
+                                                                                                            src="/assets/like.png"
+                                                                                                            className="w-[20px] h-[20px]"
+                                                                                                        />
+                                                                                                        {
+                                                                                                            data
+                                                                                                                .likes
+                                                                                                                .length
+                                                                                                        }
+                                                                                                    </div>
+                                                                                                </TooltipTrigger>
+                                                                                                <TooltipContent>
+                                                                                                    <>
+                                                                                                        {data.likes
+                                                                                                            .slice(
+                                                                                                                0,
+                                                                                                                10
+                                                                                                            )
+                                                                                                            .map(
+                                                                                                                (
+                                                                                                                    lk: any,
+                                                                                                                    index: number
+                                                                                                                ) => (
+                                                                                                                    <p
+                                                                                                                        key={
+                                                                                                                            lk.id
+                                                                                                                        }
+                                                                                                                    >
+                                                                                                                        {index !==
+                                                                                                                        9
+                                                                                                                            ? convertUser(
+                                                                                                                                  lk
+                                                                                                                                      .user
+                                                                                                                                      .id,
+                                                                                                                                  lk
+                                                                                                                                      .user
+                                                                                                                                      .full_name,
+                                                                                                                                  user
+                                                                                                                              )
+                                                                                                                            : '...'}
+                                                                                                                    </p>
+                                                                                                                )
+                                                                                                            )}
+                                                                                                    </>
+                                                                                                </TooltipContent>
+                                                                                            </Tooltip>
+                                                                                        )}
+                                                                                        {data.likes.findIndex(
+                                                                                            (
+                                                                                                lk: any
+                                                                                            ) =>
+                                                                                                lk
+                                                                                                    .user
+                                                                                                    .id ===
+                                                                                                user?.id
+                                                                                        ) !== -1 ? (
+                                                                                            <span
+                                                                                                onClick={() =>
+                                                                                                    handleLikeComment(
+                                                                                                        data.id
+                                                                                                    )
+                                                                                                }
+                                                                                                className="text-[blue] cursor-pointer hover:underline font-bold text-[12px]"
+                                                                                            >
+                                                                                                Bỏ
+                                                                                                thích
+                                                                                            </span>
+                                                                                        ) : (
+                                                                                            <span
+                                                                                                onClick={() =>
+                                                                                                    handleLikeComment(
+                                                                                                        data.id
+                                                                                                    )
+                                                                                                }
+                                                                                                className="text-gray-500 cursor-pointer hover:underline font-bold text-[12px]"
+                                                                                            >
+                                                                                                Thích
+                                                                                            </span>
+                                                                                        )}
+
+                                                                                        <span
+                                                                                            onClick={() => {
+                                                                                                setRepOpen(
+                                                                                                    cmt.id
+                                                                                                );
+                                                                                                setValueRep(
+                                                                                                    '@' +
+                                                                                                        data
+                                                                                                            .author
+                                                                                                            .full_name +
+                                                                                                        ' '
+                                                                                                );
+                                                                                            }}
+                                                                                            className="text-gray-500 cursor-pointer hover:underline font-bold  text-[12px]"
+                                                                                        >
+                                                                                            Trả lời
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                {repOpen === cmt.id && (
+                                                                    <div className="flex chat-box c-after-box gap-3 pt-[10px] bg-background items-center w-full  max-w-[400px]">
+                                                                        <img
+                                                                            src={`${
+                                                                                STATIC_HOST_NO_SPLASH +
+                                                                                user?.profile_picture
+                                                                            }`}
+                                                                            className="rounded-full  w-[40px] h-[40px] object-cover border "
+                                                                        />
+                                                                        <Input
+                                                                            autoFocus={true}
+                                                                            value={valueRep}
+                                                                            onChange={
+                                                                                handleRepChange
+                                                                            }
+                                                                            spellCheck={false}
+                                                                            onKeyDown={(e) =>
+                                                                                handleKeyDownRep(
+                                                                                    e,
+                                                                                    cmt,
+                                                                                    item.id
+                                                                                )
+                                                                            }
+                                                                            type="text"
+                                                                            placeholder="Trả lời bình luận...."
+                                                                            className="bg-slate-200 dark:bg-[#334257]  h-9 flex-1  rounded-3xl placeholder:text-gray-500 pl-4 pr-3"
+                                                                        />
+                                                                        <Send />
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         )}
-                                                    </div>
+                                                    </>
                                                 ))}
                                             </div>
 
@@ -995,6 +1157,20 @@ export const NewsFeed = () => {
                     </div>
                 )}
             </div>
+            <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Bạn cóa chăc chẵn muốn gỡ?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Hành động xóa này sẽ vĩnh viễn xóa đi và không thể khôi phục
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => navDel()}>Xóa</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

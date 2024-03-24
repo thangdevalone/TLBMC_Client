@@ -1,19 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import React, { useState } from 'react';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { type VariantProps } from 'class-variance-authority';
 import { CommandInput } from '@/components/ui/command';
-import { toast } from '../ui/use-toast';
+import { type VariantProps } from 'class-variance-authority';
+import React from 'react';
 import { v4 as uuid } from 'uuid';
-import { TagPopover } from './tag-popover';
-import { TagList } from './tag-list';
-import { tagVariants } from './tag';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { toast } from '../ui/use-toast';
 import { Autocomplete } from './auto-complete';
 import { Label } from './label';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { appActions } from '@/app/AppSlice';
+import { tagVariants } from './tag';
+import { TagList } from './tag-list';
+import { TagPopover } from './tag-popover';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export enum Delimiter {
@@ -70,7 +69,7 @@ export interface TagInputProps extends OmittedInputProps, VariantProps<typeof ta
 
 }
 
-const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
+const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>((props, _ref) => {
     const {
         id,
         placeholder,
@@ -121,7 +120,7 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>((props, ref) 
     const [tagCount, setTagCount] = React.useState(Math.max(0, tags.length));
     const inputRef = React.useRef<HTMLInputElement>(null);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [draggedTagId, setDraggedTagId] = React.useState<string | null>(null);
+    // const [draggedTagId, setDraggedTagId] = React.useState<string | null>(null);
     
     if (
         (maxTags !== undefined && maxTags < 0) ||
@@ -419,3 +418,4 @@ const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>((props, ref) 
 TagInput.displayName = 'TagInput';
 
 export { TagInput };
+

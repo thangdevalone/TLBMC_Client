@@ -70,7 +70,6 @@ export function RegisterPage() {
     });
     const [alert, setAlert] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [loading2, setLoading2] = useState(false);
     const form_1 = useForm<RegisterForm_1>({
         resolver: yupResolver(schema_1),
     });
@@ -405,10 +404,7 @@ export function RegisterPage() {
                                 />
                                 <AlertDialogFooter className="mt-4">
                                     <AlertDialogCancel>Hủy</AlertDialogCancel>
-                                    <Button disabled={loading2} type="submit">
-                                        {loading2 && (
-                                            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                                        )}
+                                    <Button  type="submit">
                                         Xác nhận
                                     </Button>
                                 </AlertDialogFooter>

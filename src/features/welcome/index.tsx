@@ -45,18 +45,24 @@ export default function Welcome() {
     const handleLogout = () => {
         dispatch(authActions.logout());
     };
+    const [showLoading,setShowLoading]=useState(true)
     useEffect(() => {
         // Set a timeout to show the Typed component after 2 seconds
         const timeoutId = setTimeout(() => {
             setShowTyped(true);
         }, 1000);
+        const timeoutId2 = setTimeout(() => {
+            setShowLoading(false);
+        }, 2500);
         return () => {
             clearTimeout(timeoutId);
+            clearTimeout(timeoutId2);
+
         };
     }, []);
     return (
         <div className="h-screen w-screen relative overflow-hidden">
-            <LoadingPage />
+            {showLoading &&<LoadingPage />}
             <header>
                 <div className="py-5 px-[50px] flex items-center justify-between ">
                     <a href="/" className="cursor-pointer inline-block">
@@ -94,7 +100,7 @@ export default function Welcome() {
                                         <img
                                             src={`${STATIC_HOST_NO_SPLASH + user.profile_picture}`}
                                             alt="avatar"
-                                            className=" cursor-pointer w-12 h-12 border rounded-full"
+                                            className=" cursor-pointer object-cover w-[50px] h-[50px] border rounded-full"
                                         />
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent side="bottom" align="end">

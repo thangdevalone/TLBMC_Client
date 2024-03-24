@@ -6,6 +6,14 @@ const postApi = {
         const url='posts/'
         return axiosClient.get(url)
     },
+    delNew(id:number){
+        const url=`posts/${id}`
+        return axiosClient.delete(url)
+    },
+    delCom(id:number){
+        const url=`comments/${id}`
+        return axiosClient.delete(url)
+    },
     postNew(data:PostForm){
         const url='posts/'
         return axiosClient.post(url,data)

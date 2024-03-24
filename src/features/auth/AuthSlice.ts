@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ImageDel, InfoUser, LoginForm } from '@/models';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
@@ -20,14 +21,15 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        login(state, action: PayloadAction<LoginForm>) {
+        login(state, _action: PayloadAction<LoginForm>) {
             state.logging = true;
             state.actionAuth = 'No action';
         },
         setUser(state, action: PayloadAction<InfoUser|{related_images:ImageDel[]}>) {
-            const old = state.currentUser;
-            const newU = { ...old, ...action.payload }; // Sửa ở đây
-            state.currentUser = newU;
+            state.currentUser = {
+                ...state.currentUser,
+                related_images: action.payload.related_images,
+              } as InfoUser;
         },
         loginSuccess(state, action: PayloadAction<InfoUser>) {
             state.logging = false;
@@ -39,7 +41,7 @@ export const authSlice = createSlice({
             state.actionAuth = 'Failed';
         },
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        register(state, action) {
+        register(state, _action) {
             state.registering = true;
             state.actionAuth = 'No action';
         },

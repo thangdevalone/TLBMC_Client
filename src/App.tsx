@@ -32,6 +32,9 @@ import { Friends } from './features/home/Friends';
 import { Learns } from './features/home/Learns';
 import { Chats } from './features/home/Chats';
 import { appActions } from './app/AppSlice';
+import { Course } from './features/home/Learns/Course';
+import { MarkCourse } from './features/home/Learns/MarkCourse';
+import { ManagerCourse } from './features/home/Learns/ManagerCourse';
 const checkTokenExpiration = (token: string) => {
     const decodedToken = jwtDecode<JwtPayload>(token);
     const currentTime = Date.now() / 1000; // Chuyển đổi thời gian hiện tại sang định dạng Unix time
@@ -68,12 +71,11 @@ function App() {
     const dispatch = useDispatch();
     useEffect(() => {
         function handleResize() {
-        
             dispatch(appActions.setWidth(getWindowDimensions().width));
         }
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
         <ThemeProvider defaultTheme="light" storageKey="theme">
@@ -89,7 +91,7 @@ function App() {
                         <AlertDialogFooter>
                             <AlertDialogAction
                                 onClick={() => {
-                                    dispath(authActions.logout());
+                                    dispatch(authActions.logout());
                                 }}
                             >
                                 Đăng nhập
@@ -108,9 +110,15 @@ function App() {
                             <Route index element={<Navigate to="news-feed" />} />
                             <Route path="news-feed" element={<NewsFeed />} />
                             <Route path="friends" element={<Friends />} />
-                            <Route path="learns" element={<Learns />} />
+                            <Route path="learns" element={<Learns />}>
+                                <Route index element={<Navigate to="course" />} />
+                                <Route path="course" element={<Course />} />
+                                {P?.IS_ADMIN && <Route path="admin" element={<ManagerCourse />} />}
+                                <Route path="save" element={<MarkCourse />} />
+                            </Route>
                             <Route path="chats" element={<Chats />} />
                         </Route>
+
                         <Route path="settings" element={<SettingsLayout />}>
                             <Route index element={<Navigate to="profile" />} />
                             <Route path="profile" element={<Profile />} />

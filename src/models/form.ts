@@ -3,7 +3,7 @@ export interface PostForm {
     global_post: boolean;
 }
 export interface UserUpdateForm {
-    email: string;// Điều chỉnh kiểu dữ liệu nếu cần
+    email: string; // Điều chỉnh kiểu dữ liệu nếu cần
     full_name: string;
     date_of_birth: string; // Hoặc kiểu dữ liệu phù hợp cho ngày tháng
     phone_number: string;
@@ -17,4 +17,16 @@ export interface UserUpdateForm {
     activities?: string; // Điều chỉnh kiểu dữ liệu nếu cần
     certificates?: string; // Điều chỉnh kiểu dữ liệu nếu cần
     awards?: string; // Điều chỉnh kiểu dữ liệu nếu cần
+}
+
+export interface CreateCourseForm {
+    title: string;
+    description?: string;
+    link: string;
+}
+
+export interface ChangePass{
+    current_password:string;
+    new_password:string
+    re_password:string;
 }

@@ -42,7 +42,7 @@ export const NavHeader = () => {
                         </div>
                         </Link>
                         <Link to={"/home/learns"}>
-                        <div className={cn("cursor-pointer p-2 gap-[2px] items-center flex flex-col hover:bg-slate-200 dark:hover:bg-[#334257] rounded-md",pathname=="/home/learns"?"bg-slate-200 dark:bg-[#334257]":"")}>
+                        <div className={cn("cursor-pointer p-2 gap-[2px] items-center flex flex-col hover:bg-slate-200 dark:hover:bg-[#334257] rounded-md",pathname.split('/').includes('learns')?"bg-slate-200 dark:bg-[#334257]":"")}>
                             <Icons.data color={theme==="dark" ? "white":""}/>
                             <span className="font-medium text-sm">Kho khóa học</span>
                         </div>

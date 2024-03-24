@@ -54,8 +54,8 @@ export const SettingsLayout = () => {
                                     className={cn(
                                         buttonVariants({ variant: 'ghost' }),
                                         pathname === item.href
-                                            ? 'bg-muted hover:bg-muted'
-                                            : 'hover:bg-muted',
+                                        ? 'bg-slate-200 hover:bg-slate-200 dark:bg-[#334257] dark:hover:bg-[#334257] '
+                                        : 'hover:bg-slate-200 dark:hover:bg-[#334257]',
                                         'justify-start',
                                         'gap-2 h-10'
                                     )}

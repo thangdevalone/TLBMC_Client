@@ -45,3 +45,13 @@ export interface Author {
     education: string;
     profile_picture: string;
 }
+export interface InfoCourse{
+    id: number
+    created_at: string
+    created_by: Author
+    saver:any[]
+    title: string
+    description: string
+    link: string
+    image: string
+}

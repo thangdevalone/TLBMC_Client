@@ -7,7 +7,7 @@ const TimePicker = React.forwardRef<
   HTMLDivElement,
   Omit<TimeFieldStateOptions<TimeValue>, "locale">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
->((props, forwardedRef) => {
+>((props, _forwardedRef) => {
   return <TimeField {...props} />;
 });
 

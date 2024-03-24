@@ -28,8 +28,9 @@ export const ManagerPass = () => {
         new_password: yup
             .string()
             .required('Nhập mật khẩu mới')
-            .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
-            .matches(/[A-Z]/, 'Mật khẩu mới phải chứa ít nhất 1 ký tự in hoa'),
+            .min(6, 'Mật khẩu phải dài hơn 6 kí tự')
+            .max(32, 'Mật khẩu quá dài')
+            .matches(/[A-Z]+/, 'Mật khẩu cần ít nhất 1 kí tự in hoa'),
         re_password: yup
             .string()
             .required('Nhập lại mật khẩu mới')
@@ -49,9 +50,9 @@ export const ManagerPass = () => {
     const handleEdit: SubmitHandler<ChangePass> = (data) => {
         (async () => {
             try {
-                if (user && user.EmpID) {
+                if (user && user.id) {
                     setLoading(true);
-                    await authApi.changePass(user.EmpID, data);
+                    await authApi.changePass(user.id, data);
                     formEdit.reset();
                     toast({
                         title: 'Thành công',
@@ -77,7 +78,7 @@ export const ManagerPass = () => {
             try {
                 if (user) {
                     setLoading2(true);
-                    await authApi.forgotPass(user?.Email);
+                    await authApi.forgotPass(user?.email);
                     toast({
                         title: 'Thành công',
                         description: 'Link đổi mật khẩu đã được gửi vào gmail của bạn',

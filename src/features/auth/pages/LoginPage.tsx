@@ -69,30 +69,30 @@ export function LoginPage() {
         }
     }, [actionAuth, toast]);
 
-    // const handleSendGmail: SubmitHandler<GmailForm> = (data) => {
-    //     (async () => {
-    //         try {
-    //             if (data.email) {
-    //                 setLoading2(true);
-    //                 await authApi.forgotPass(data.email);
-    //                 toast({
-    //                     title: 'Thành công',
-    //                     description: 'Link đổi mật khẩu đã được gửi vào gmail của bạn',
-    //                 });
-    //                 setAlert(false);
-    //             }
-    //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //         } catch (error: any) {
-    //             toast({
-    //                 variant: 'destructive',
-    //                 title: 'Có lỗi xảy ra',
-    //                 description: error.error,
-    //             });
-    //         } finally {
-    //             setLoading2(false);
-    //         }
-    //     })();
-    // };
+    const handleSendGmail: SubmitHandler<GmailForm> = (data) => {
+        (async () => {
+            try {
+                if (data.email) {
+                    setLoading2(true);
+                    await authApi.forgotPass(data.email);
+                    toast({
+                        title: 'Thành công',
+                        description: 'Link đổi mật khẩu đã được gửi vào gmail của bạn',
+                    });
+                    setAlert(false);
+                }
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (error: any) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Có lỗi xảy ra',
+                    description: error.error,
+                });
+            } finally {
+                setLoading2(false);
+            }
+        })();
+    };
 
     const gmail_schema = yup.object().shape({
         email: yup.string().email().required('Cần nhập gmail'),
@@ -195,7 +195,7 @@ export function LoginPage() {
                         </Form>
                     </div>
                 </div>
-                {/* <AlertDialog open={alert} onOpenChange={setAlert}>
+                <AlertDialog open={alert} onOpenChange={setAlert}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Quên mật khẩu</AlertDialogTitle>
@@ -234,7 +234,7 @@ export function LoginPage() {
                             </form>
                         </Form>
                     </AlertDialogContent>
-                </AlertDialog> */}
+                </AlertDialog>
             </div>
         </>
     );
