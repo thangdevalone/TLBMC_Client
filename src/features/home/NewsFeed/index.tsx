@@ -77,6 +77,7 @@ export const NewsFeed = () => {
     const [commentOpen, setCommentOpen] = useState(-1);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ref = useRef<any>(null);
+    const [loadingCmt,setLoadingCmt] =useState(false)
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [valueComment, setValueComment] = useState('');
     const [valueRep, setValueRep] = useState('');
@@ -132,6 +133,7 @@ export const NewsFeed = () => {
     };
     const token = localStorage.getItem(StorageKeys.TOKEN);
     useEffect(() => {
+        fetchPosts()
         const ws = new WebSocket(SOCKET_URL + 'ws/comments?token=' + token);
         setSocket(ws);
         ws.onmessage = handleMessage;
@@ -151,6 +153,9 @@ export const NewsFeed = () => {
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleMessage = (_message: { data: string }) => {
+        console.log(_message.data)
+        setLoadingCmt(false)
+        setLoadingRep(false)
         fetchPosts();
     };
     const modules = {
@@ -222,14 +227,17 @@ export const NewsFeed = () => {
     const handleCommentSubmit = (data: any) => {
         // Thực hiện xử lý khi người dùng nhấn phím Enter
         // Đặt newComment về trạng thái ban đầu hoặc thực hiện hành động khác
+        setLoadingCmt(true)
         if (socket) {
             socket.send(JSON.stringify(data));
         }
         setValueComment('');
     };
+    const [loadingRep,setLoadingRep]=useState(false)
     const handleRepSubmit = (data: any) => {
         // Thực hiện xử lý khi người dùng nhấn phím Enter
         // Đặt newComment về trạng thái ban đầu hoặc thực hiện hành động khác
+        setLoadingRep(true)
         if (socket) {
             socket.send(JSON.stringify(data));
         }
@@ -709,10 +717,11 @@ export const NewsFeed = () => {
                                             </p>
                                             <div className="flex flex-col gap-3 mt-3 ">
                                                 {item.comments.map((cmt) => (
-                                                    <>
+                                                    <React.Fragment key={cmt.id}>
                                                         {cmt.rep === null && (
                                                             <div
-                                                                className={cn(
+                                                                key={cmt.id}
+                                                                    className={cn(
                                                                     'container-chat',
                                                                     repOpen
                                                                         ? ' b-after'
@@ -720,7 +729,7 @@ export const NewsFeed = () => {
                                                                 )}
                                                             >
                                                                 <div
-                                                                    key={cmt.id}
+                                                                   
                                                                     className="flex gap-3 w-fit max-w-[350px] relative flex-row"
                                                                 >
                                                                     <img
@@ -1111,12 +1120,13 @@ export const NewsFeed = () => {
                                                                             placeholder="Trả lời bình luận...."
                                                                             className="bg-slate-200 dark:bg-[#334257]  h-9 flex-1  rounded-3xl placeholder:text-gray-500 pl-4 pr-3"
                                                                         />
-                                                                        <Send />
+                                                                        {loadingCmt ?<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />: <Send onClick={()=>handleRepSubmit({ comment: valueRep, rep_id: cmt.id, post_id: item.id })} className='cursor-pointer' />}
+                                                                       
                                                                     </div>
                                                                 )}
                                                             </div>
                                                         )}
-                                                    </>
+                                                    </React.Fragment>
                                                 ))}
                                             </div>
 
@@ -1140,7 +1150,7 @@ export const NewsFeed = () => {
                                             placeholder="Nhập bình luận về bài viết..."
                                             className="bg-slate-200 dark:bg-[#334257] h-9 flex-1  rounded-3xl placeholder:text-gray-500 pl-4 pr-3"
                                         />
-                                        <Send />
+                                        {loadingCmt ?<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />: <Send onClick={()=>handleCommentSubmit({ comment: valueComment, post_id: item.id })} className='cursor-pointer' />}
                                     </div>
                                 </div>
                             )}
