@@ -7,4 +7,4 @@
 
 export const STATIC_HOST = 'https://api-tlbmc.thangdev.online/api/';
 export const STATIC_HOST_NO_SPLASH = 'https://api-tlbmc.thangdev.online';
-export const SOCKET_URL = 'ws://api-tlbmc.thangdev.online';
+export const SOCKET_URL = 'wss://api-tlbmc.thangdev.online';
